@@ -1,0 +1,118 @@
+p {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  background: #ffffff;
+  color: #333;
+
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  background-image: url('https://blog.bangkokair.com/wp-content/uploads/2023/05/11_must-visit-phuket-beaches.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: #333;
+}
+
+
+
+/* ส่วนหัวของเว็บไซต์ */
+header {
+  background:url(https://cdn.pixabay.com/photo/2020/04/19/08/17/watercolor-5062356_1280.jpg);
+  color: white;
+  padding: 20px 0;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  
+}
+
+header h1 {
+  font-size: 2.5em;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  padding-top: 10px;
+}
+
+nav ul li {
+  margin: 0 15px;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+nav ul li a:hover {
+  color: #cce7ff;
+}
+
+/* ส่วนเนื้อหา */
+main {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+section, article {
+  background: rgb(255, 255, 255);
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0px 0px 50px 100px rgba(0,0,0,0.05);
+  transition:background-color 0.3s ease, transform 0.3s ease;
+}
+section:hover {
+  background-color: #2980b9;
+  transform: scale(1.05);
+  color: #ffffff;
+
+}
+section:hover .tono {
+  color: #ffffff;
+}
+
+
+
+
+h2 {
+  color: #4a90e2;
+  margin-bottom: 10px;
+}
+
+/* ส่วนท้าย */
+footer {
+  text-align: center;
+  padding: 20px;
+  background: #eaeaea;
+  color: #555;
+  font-size: 0.9em;
+}
+.tono{
+    color: #4a90e2;
+  font-weight: bold;
+  text-decoration: none;
+  transition:background-color 0.3s ease, transform 0.3s ease;
+}
+.tono:hover {
+  color: #ffffff;
+}
+.gay{
+  background: rgb(255, 255, 255);
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0px 0px 50px 200px rgba(0,0,0,0.05);
+  transition:background-color 0.3s ease, transform 0.3s ease;
+}
