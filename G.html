@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เว็บจับคู่คนรัก</title>
+    <title>เว็บจับคู่คนรักด้วยการวิเคราะห์ใบหน้า</title>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -53,12 +54,19 @@
             align-items: center;
             overflow: hidden;
             background-color: #FFF0F7;
+            position: relative;
         }
         
         .photo-placeholder img {
             max-width: 100%;
             max-height: 100%;
             display: none;
+        }
+        
+        .photo-placeholder canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
         }
         
         .upload-btn {
@@ -134,17 +142,25 @@
             cursor: not-allowed;
             transform: none;
         }
+        
+        .loading {
+            display: none;
+            color: #FF5C8D;
+            font-size: 18px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>เว็บจับคู่คนรัก</h1>
+        <h1>เว็บจับคู่คนรักด้วยการวิเคราะห์ใบหน้า</h1>
         
         <div class="couple-container">
             <div class="photo-container">
                 <div class="photo-placeholder" id="photo1">
                     <span>ใส่รูปคนที่ 1</span>
                     <img id="preview1">
+                    <canvas id="canvas1"></canvas>
                 </div>
                 <input type="file" id="upload1" accept="image/*" style="display: none;">
                 <button class="upload-btn" onclick="document.getElementById('upload1').click()">เลือกรูป</button>
@@ -156,13 +172,15 @@
                 <div class="photo-placeholder" id="photo2">
                     <span>ใส่รูปคนที่ 2</span>
                     <img id="preview2">
+                    <canvas id="canvas2"></canvas>
                 </div>
                 <input type="file" id="upload2" accept="image/*" style="display: none;">
                 <button class="upload-btn" onclick="document.getElementById('upload2').click()">เลือกรูป</button>
             </div>
         </div>
         
-        <button class="calculate-btn" id="calculateBtn" disabled>คำนวณความเป็นคู่</button>
+        <div class="loading" id="loading">กำลังวิเคราะห์ใบหน้า...</div>
+        <button class="calculate-btn" id="calculateBtn" disabled>วิเคราะห์ความเหมือน</button>
         
         <div class="result-container" id="resultContainer">
             <div class="percentage" id="percentage">0%</div>
@@ -171,20 +189,37 @@
     </div>
 
     <script>
-        // ตัวแปรเก็บรูปภาพ
+        // ตัวแปรเก็บข้อมูลใบหน้า
+        let faceDescriptor1 = null;
+        let faceDescriptor2 = null;
         let image1Loaded = false;
         let image2Loaded = false;
         
+        // โหลดโมเดล face-api.js
+        Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),
+            faceapi.nets.faceLandmark68Net.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),
+            faceapi.nets.faceRecognitionNet.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),
+            faceapi.nets.faceExpressionNet.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models')
+        ]).then(startApp);
+        
+        function startApp() {
+            console.log("โมเดลโหลดเรียบร้อยแล้ว");
+        }
+        
         // ฟังก์ชันแสดงรูปภาพเมื่ออัพโหลด
-        document.getElementById('upload1').addEventListener('change', function(e) {
+        document.getElementById('upload1').addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(event) {
+                reader.onload = async function(event) {
                     const preview = document.getElementById('preview1');
                     preview.src = event.target.result;
                     preview.style.display = 'block';
                     document.querySelector('#photo1 span').style.display = 'none';
+                    
+                    // วิเคราะห์ใบหน้า
+                    await detectFace(preview, 'canvas1', 1);
                     image1Loaded = true;
                     checkImages();
                 }
@@ -192,21 +227,54 @@
             }
         });
         
-        document.getElementById('upload2').addEventListener('change', function(e) {
+        document.getElementById('upload2').addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(event) {
+                reader.onload = async function(event) {
                     const preview = document.getElementById('preview2');
                     preview.src = event.target.result;
                     preview.style.display = 'block';
                     document.querySelector('#photo2 span').style.display = 'none';
+                    
+                    // วิเคราะห์ใบหน้า
+                    await detectFace(preview, 'canvas2', 2);
                     image2Loaded = true;
                     checkImages();
                 }
                 reader.readAsDataURL(file);
             }
         });
+        
+        // ฟังก์ชันตรวจจับใบหน้าและคำนวณ descriptor
+        async function detectFace(imgElement, canvasId, faceNumber) {
+            const displaySize = { width: imgElement.width, height: imgElement.height };
+            faceapi.matchDimensions(document.getElementById(canvasId), displaySize);
+            
+            const detections = await faceapi.detectAllFaces(imgElement, new faceapi.TinyFaceDetectorOptions())
+                .withFaceLandmarks()
+                .withFaceDescriptors();
+            
+            if (detections.length === 0) {
+                alert(`ไม่พบใบหน้าในรูปคนที่ ${faceNumber} กรุณาเลือกรูปอื่น`);
+                return;
+            }
+            
+            // วาดกรอบรอบใบหน้า
+            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+            const canvas = document.getElementById(canvasId);
+            canvas.width = imgElement.width;
+            canvas.height = imgElement.height;
+            faceapi.draw.drawDetections(canvas, resizedDetections);
+            faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+            
+            // บันทึกข้อมูลใบหน้า
+            if (faceNumber === 1) {
+                faceDescriptor1 = detections[0].descriptor;
+            } else {
+                faceDescriptor2 = detections[0].descriptor;
+            }
+        }
         
         // ตรวจสอบว่ามีรูปภาพทั้งสองฝั่งหรือไม่
         function checkImages() {
@@ -218,24 +286,59 @@
             }
         }
         
-        // ฟังก์ชันคำนวณความเป็นคู่
+        // ฟังก์ชันคำนวณความเหมือนของใบหน้า
         document.getElementById('calculateBtn').addEventListener('click', function() {
-            // สุ่มเปอร์เซ็นต์ระหว่าง 50-100 (เพื่อให้ดูดี)
-            const percentage = Math.floor(Math.random() * 51) + 50;
-            document.getElementById('percentage').textContent = percentage + '%';
+            const loadingElement = document.getElementById('loading');
+            const resultContainer = document.getElementById('resultContainer');
             
-            // ข้อความตามเปอร์เซ็นต์
-            let message = '';
-            if (percentage >= 90) {
-                message = 'คุณสองคนเหมาะกันมาก! เป็นคู่ที่สมบูรณ์แบบเลยค่ะ';
-            } else if (percentage >= 80) {
-                message = 'คุณสองคนเข้ากันได้ดีมาก มีอนาคตที่สดใสแน่นอน';
-            } else if (percentage >= 70) {
-                message = 'คุณสองคนเข้ากันได้ดี แต่ยังมีที่ต้องปรับตัวบ้าง';
-            } else if (percentage >= 60) {
-                message = 'คุณสองคนเข้ากันได้พอใช้ ต้องพยายามอีกนิดนะคะ';
-            } else {
-                message = 'อาจจะต้องทำความรู้จักกันมากขึ้นอีกหน่อยค่ะ';
+            loadingElement.style.display = 'block';
+            resultContainer.style.display = 'none';
+            
+            setTimeout(async () => {
+                if (!faceDescriptor1 || !faceDescriptor2) {
+                    alert('ไม่สามารถวิเคราะห์ใบหน้าได้ กรุณาลองอีกครั้ง');
+                    loadingElement.style.display = 'none';
+                    return;
+                }
+                
+                // คำนวณระยะห่างระหว่างใบหน้า (ค่าต่ำหมายความว่าเหมือนกันมาก)
+                const distance = faceapi.euclideanDistance(faceDescriptor1, faceDescriptor2);
+                
+                // แปลงเป็นเปอร์เซ็นต์ความเหมือน (ระยะทาง 0.6 ขึ้นไปถือว่าไม่เหมือนกันเลย)
+                let percentage = Math.round((1 - Math.min(distance / 0.6, 1)) * 100);
+                
+                // ปรับให้เปอร์เซ็นต์ดูดีขึ้น (ไม่ต่ำกว่า 30%)
+                percentage = Math.max(percentage, 30);
+                
+                document.getElementById('percentage').textContent = percentage + '%';
+                
+                // ข้อความตามเปอร์เซ็นต์
+                let message = '';
+                if (percentage >= 90) {
+                    message = 'คุณสองคนหน้าตาเหมือนกันมาก! เหมือนพี่เหมือนน้องเลย';
+                } else if (percentage >= 80) {
+                    message = 'คุณสองคนมีใบหน้าที่คล้ายกันมาก มีความเป็นคู่ที่สูงมาก';
+                } else if (percentage >= 70) {
+                    message = 'คุณสองคนมีลักษณะใบหน้าที่เข้ากันได้ดี';
+                } else if (percentage >= 60) {
+                    message = 'คุณสองคนมีบางส่วนที่คล้ายกัน';
+                } else if (percentage >= 50) {
+                    message = 'คุณสองคนมีลักษณะใบหน้าที่ต่างกัน แต่ก็ยังมีบางส่วนที่คล้ายกัน';
+                } else {
+                    message = 'คุณสองคนมีลักษณะใบหน้าที่แตกต่างกันมาก';
+                }
+                
+                document.getElementById('message').textContent = message;
+                resultContainer.style.display = 'block';
+                loadingElement.style.display = 'none';
+                
+                // เลื่อนไปที่ผลลัพธ์
+                resultContainer.scrollIntoView({ behavior: 'smooth' });
+            }, 500);
+        });
+    </script>
+</body>
+</html>                message = 'อาจจะต้องทำความรู้จักกันมากขึ้นอีกหน่อยค่ะ';
             }
             
             document.getElementById('message').textContent = message;
