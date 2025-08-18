@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เว็บจับคู่คนรัก</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #FFE6F2;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(255, 138, 191, 0.3);
+            padding: 30px;
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #FF5C8D;
+            margin-bottom: 30px;
+        }
+        
+        .couple-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .photo-container {
+            width: 45%;
+            position: relative;
+        }
+        
+        .photo-placeholder {
+            width: 100%;
+            height: 300px;
+            border: 3px dashed #FF8ABF;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-color: #FFF0F7;
+        }
+        
+        .photo-placeholder img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+        
+        .upload-btn {
+            background-color: #FF8ABF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .upload-btn:hover {
+            background-color: #FF5C8D;
+            transform: scale(1.05);
+        }
+        
+        .heart {
+            font-size: 60px;
+            color: #FF5C8D;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #FFF0F7;
+            border-radius: 15px;
+            display: none;
+        }
+        
+        .percentage {
+            font-size: 60px;
+            font-weight: bold;
+            color: #FF5C8D;
+            margin: 20px 0;
+        }
+        
+        .message {
+            color: #FF5C8D;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .calculate-btn {
+            background-color: #FF5C8D;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+        
+        .calculate-btn:hover {
+            background-color: #FF2D6F;
+            transform: scale(1.05);
+        }
+        
+        .calculate-btn:disabled {
+            background-color: #CCCCCC;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>เว็บจับคู่คนรัก</h1>
+        
+        <div class="couple-container">
+            <div class="photo-container">
+                <div class="photo-placeholder" id="photo1">
+                    <span>ใส่รูปคนที่ 1</span>
+                    <img id="preview1">
+                </div>
+                <input type="file" id="upload1" accept="image/*" style="display: none;">
+                <button class="upload-btn" onclick="document.getElementById('upload1').click()">เลือกรูป</button>
+            </div>
+            
+            <div class="heart">❤️</div>
+            
+            <div class="photo-container">
+                <div class="photo-placeholder" id="photo2">
+                    <span>ใส่รูปคนที่ 2</span>
+                    <img id="preview2">
+                </div>
+                <input type="file" id="upload2" accept="image/*" style="display: none;">
+                <button class="upload-btn" onclick="document.getElementById('upload2').click()">เลือกรูป</button>
+            </div>
+        </div>
+        
+        <button class="calculate-btn" id="calculateBtn" disabled>คำนวณความเป็นคู่</button>
+        
+        <div class="result-container" id="resultContainer">
+            <div class="percentage" id="percentage">0%</div>
+            <div class="message" id="message"></div>
+        </div>
+    </div>
+
+    <script>
+        // ตัวแปรเก็บรูปภาพ
+        let image1Loaded = false;
+        let image2Loaded = false;
+        
+        // ฟังก์ชันแสดงรูปภาพเมื่ออัพโหลด
+        document.getElementById('upload1').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const preview = document.getElementById('preview1');
+                    preview.src = event.target.result;
+                    preview.style.display = 'block';
+                    document.querySelector('#photo1 span').style.display = 'none';
+                    image1Loaded = true;
+                    checkImages();
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        document.getElementById('upload2').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const preview = document.getElementById('preview2');
+                    preview.src = event.target.result;
+                    preview.style.display = 'block';
+                    document.querySelector('#photo2 span').style.display = 'none';
+                    image2Loaded = true;
+                    checkImages();
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // ตรวจสอบว่ามีรูปภาพทั้งสองฝั่งหรือไม่
+        function checkImages() {
+            const btn = document.getElementById('calculateBtn');
+            if (image1Loaded && image2Loaded) {
+                btn.disabled = false;
+            } else {
+                btn.disabled = true;
+            }
+        }
+        
+        // ฟังก์ชันคำนวณความเป็นคู่
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            // สุ่มเปอร์เซ็นต์ระหว่าง 50-100 (เพื่อให้ดูดี)
+            const percentage = Math.floor(Math.random() * 51) + 50;
+            document.getElementById('percentage').textContent = percentage + '%';
+            
+            // ข้อความตามเปอร์เซ็นต์
+            let message = '';
+            if (percentage >= 90) {
+                message = 'คุณสองคนเหมาะกันมาก! เป็นคู่ที่สมบูรณ์แบบเลยค่ะ';
+            } else if (percentage >= 80) {
+                message = 'คุณสองคนเข้ากันได้ดีมาก มีอนาคตที่สดใสแน่นอน';
+            } else if (percentage >= 70) {
+                message = 'คุณสองคนเข้ากันได้ดี แต่ยังมีที่ต้องปรับตัวบ้าง';
+            } else if (percentage >= 60) {
+                message = 'คุณสองคนเข้ากันได้พอใช้ ต้องพยายามอีกนิดนะคะ';
+            } else {
+                message = 'อาจจะต้องทำความรู้จักกันมากขึ้นอีกหน่อยค่ะ';
+            }
+            
+            document.getElementById('message').textContent = message;
+            document.getElementById('resultContainer').style.display = 'block';
+            
+            // เลื่อนไปที่ผลลัพธ์
+            document.getElementById('resultContainer').scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+</body>
+  </html>
