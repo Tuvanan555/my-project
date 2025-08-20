@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ผักสดใหม่ - เว็บเกี่ยวกับผัก</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f8f8;
+            color: #333;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* เมนูด้านข้าง */
+        .sidebar {
+            width: 280px;
+            background-color: #2e7d32;
+            color: white;
+            padding: 20px 0;
+            transition: transform 0.3s ease;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .close-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .categories {
+            list-style: none;
+        }
+        
+        .category-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+        }
+        
+        .category-item:hover {
+            background-color: #1b5e20;
+        }
+        
+        .category-item i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        /* พื้นที่เนื้อหาหลัก */
+        .content {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .logo h1 {
+            font-size: 2.5rem;
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        
+        .logo p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .vegetable-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        
+        .vegetable-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .vegetable-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-img {
+            height: 180px;
+            background-color: #e8f5e9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2e7d32;
+            font-size: 3rem;
+        }
+        
+        .card-content {
+            padding: 15px;
+        }
+        
+        .card-content h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        
+        .card-content p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .vegetable-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- เมนูด้านซ้าย -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>หมวดหมู่ผัก</h2>
+                <button class="close-btn" onclick="closeSidebar()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <ul class="categories">
+                <li class="category-item" onclick="showCategory('leafy')">
+                    <i class="fas fa-leaf"></i> ผักใบเขียว
+                </li>
+                <li class="category-item" onclick="showCategory('fruit')">
+                    <i class="fas fa-apple-alt"></i> ผักผล
+                </li>
+                <li class="category-item" onclick="showCategory('root')">
+                    <i class="fas fa-carrot"></i> ผักหัว
+                </li>
+                <li class="category-item" onclick="showCategory('herb')">
+                    <i class="fas fa-seedling"></i> สมุนไพร
+                </li>
+                <li class="category-item" onclick="showCategory('organic')">
+                    <i class="fas fa-leaf"></i> ผักออร์แกนิก
+                </li>
+            </ul>
+        </div>
+        
+        <!-- เนื้อหาหลัก -->
+        <div class="content">
+            <div class="logo">
+                <h1>ผักสดใหม่</h1>
+                <p>แหล่งข้อมูลเกี่ยวกับผักนานาชนิด</p>
+            </div>
+            
+            <div class="vegetable-grid">
+                <div class="vegetable-card">
+                    <div class="card-img">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>ผักคะน้า</h3>
+                        <p>ผักใบเขียวมากคุณประโยชน์ อุดมด้วยวิตามินและแร่ธาตุ</p>
+                    </div>
+                </div>
+                
+                <div class="vegetable-card">
+                    <div class="card-img">
+                        <i class="fas fa-carrot"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>แครอท</h3>
+                        <p>ผักหัวสีส้ม อุดมด้วยเบต้าแคโรทีนที่ดีต่อสายตา</p>
+                    </div>
+                </div>
+                
+                <div class="vegetable-card">
+                    <div class="card-img">
+                        <i class="fas fa-pepper-hot"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>พริกหวาน</h3>
+                        <p>ผักผลหลากสี รสชาติกรอบอร่อย ใช้ประกอบอาหารได้หลายเมนู</p>
+                    </div>
+                </div>
+                
+                <div class="vegetable-card">
+                    <div class="card-img">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>โหระพา</h3>
+                        <p>สมุนไพรกลิ่นหอม ใช้เป็นส่วนประกอบในอาหารอิตาเลียนและไทย</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showCategory(category) {
+            alert('คุณเลือกหมวดหมู่: ' + category);
+            // ในเว็บจริงควรแสดงเนื้อหาตามหมวดหมู่ที่เลือก
+        }
+        
+        function closeSidebar() {
+            document.querySelector('.sidebar').style.transform = 'translateX(-100%)';
+            // ในเว็บจริงอาจต้องเพิ่มปุ่มเพื่อเปิดเมนูคืน
+        }
+    </script>
+</body>
+  </html>
