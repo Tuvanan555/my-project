@@ -3,262 +3,371 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ผักสดใหม่ - เว็บเกี่ยวกับผัก</title>
+    <title>เว็บธีมขาวเขียว - ปรับปรุงแล้ว</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #2e7d32;
+            --primary-light: #4caf50;
+            --primary-dark: #1b5e20;
+            --accent-color: #ff5722;
+            --text-color: #333;
+            --text-light: #666;
+            --background: #f9f9f9;
+            --card-bg: #ffffff;
+            --gradient: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-dark) 100%);
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --mobile-padding: 20px; /* 新增变量控制移动端间距 */
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Kanit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background-color: #f8f8f8;
-            color: #333;
+            background-color: var(--background);
+            color: var(--text-color);
+            transition: margin-left 0.3s ease;
+            line-height: 1.6;
         }
         
-        .container {
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        /* เมนูด้านข้าง */
+        /* แถบเมนูด้านซ้าย */
         .sidebar {
+            height: 100%;
             width: 280px;
-            background-color: #2e7d32;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--gradient);
+            overflow-x: hidden;
+            padding-top: 80px;
+            transition: 0.3s;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+        }
+        
+        /* ลิงก์เมนู */
+        .sidebar a {
+            padding: 16px 30px;
+            text-decoration: none;
+            font-size: 18px;
             color: white;
-            padding: 20px 0;
-            transition: transform 0.3s ease;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .sidebar-header {
-            padding: 0 20px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            margin-bottom: 20px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
         
-        .sidebar-header h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
+        .sidebar a i {
+            margin-right: 15px;
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
         }
         
-        .close-btn {
-            background: none;
+        .sidebar a:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            background-color: white;
+            transform: scaleY(0);
+            transition: var(--transition);
+        }
+        
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding-left: 35px;
+        }
+        
+        .sidebar a:hover:before {
+            transform: scaleY(1);
+        }
+        
+        .sidebar a.active {
+            background-color: rgba(255, 255, 255, 0.15);
+            font-weight: 500;
+        }
+        
+        .sidebar a.active:before {
+            transform: scaleY(1);
+        }
+        
+        /* ปุ่มเปิด/ปิดเมนู */
+        .toggle-btn {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            z-index: 1001;
+            background-color: var(--primary-light);
+            color: white;
             border: none;
-            color: white;
-            font-size: 1.5rem;
+            border-radius: 50%;
+            width: 55px;
+            height: 55px;
             cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .close-btn:hover {
-            transform: scale(1.1);
-        }
-        
-        .categories {
-            list-style: none;
-        }
-        
-        .category-item {
-            padding: 15px 20px;
-            cursor: pointer;
-            transition: background-color 0.3s;
+            font-size: 24px;
             display: flex;
             align-items: center;
-            font-size: 1.1rem;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
         }
         
-        .category-item:hover {
-            background-color: #1b5e20;
-        }
-        
-        .category-item i {
-            margin-right: 10px;
-            font-size: 1.2rem;
+        .toggle-btn:hover {
+            background-color: var(--primary-dark);
+            transform: rotate(90deg);
         }
         
         /* พื้นที่เนื้อหาหลัก */
         .content {
-            flex: 1;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            margin-left: 280px;
+            padding: 25px;
+            transition: margin-left 0.3s ease;
         }
         
-        .logo {
+        /* เมื่อเมนูถูกปิด */
+        .sidebar.close {
+            width: 0;
+        }
+        
+        .content.close {
+            margin-left: 0;
+        }
+        
+        /* ส่วนหัว */
+        header {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
             margin-bottom: 30px;
-            text-align: center;
-        }
-        
-        .logo h1 {
-            font-size: 2.5rem;
-            color: #2e7d32;
-            margin-bottom: 10px;
-        }
-        
-        .logo p {
-            color: #666;
-            font-size: 1.1rem;
-        }
-        
-        .vegetable-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            width: 100%;
-            max-width: 1200px;
-        }
-        
-        .vegetable-card {
-            background: white;
-            border-radius: 10px;
+            box-shadow: var(--shadow);
+            position: relative;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
         }
         
-        .vegetable-card:hover {
+        header:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient);
+        }
+        
+        h1 {
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 600px;
+            line-height: 1.8;
+        }
+        
+        /* การ์ดเนื้อหา - ปรับปรุงเพิ่มระยะห่าง */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            min-height: 300px;
+            scroll-margin-top: 20px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
         
-        .card-img {
-            height: 180px;
-            background-color: #e8f5e9;
+        .card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: var(--transition);
+        }
+        
+        .card:hover:before {
+            transform: scaleX(1);
+        }
+        
+        .card h2 {
+            color: var(--primary-dark);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e8f5e9;
+            font-weight: 500;
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: #2e7d32;
-            font-size: 3rem;
         }
         
-        .card-content {
-            padding: 15px;
+        .card h2 i {
+            margin-right: 10px;
+            color: var(--primary-light);
         }
         
-        .card-content h3 {
-            color: #2e7d32;
-            margin-bottom: 10px;
+        /* ระยะห่างของเนื้อหาใน card */
+        .card p {
+            margin-bottom: 20px;
+            line-height: 1.8;
         }
         
-        .card-content p {
-            color: #666;
-            font-size: 0.9rem;
+        .card h3 {
+            margin: 25px 0 15px 0;
+            color: var(--primary-dark);
         }
         
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
+        /* ส่วนท้าย */
+        footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 30px;
+            color: var(--text-light);
+            font-size: 16px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+        
+        /* Responsive design - ปรับปรุงสำหรับมือถือ */
+        @media screen and (max-width: 992px) {
+            .sidebar {
+                width: 230px;
+            }
+            
+            .content {
+                margin-left: 230px;
+                padding: 20px;
+            }
+            
+            .toggle-btn {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .card {
+                padding: 30px;
+            }
+        }
+        
+        @media screen and (max-width: 768px) {
+            .sidebar {
+                width: 0;
+            }
+            
+            .sidebar.close {
+                width: 230px;
+            }
+            
+            .content {
+                margin-left: 0;
+                padding: var(--mobile-padding); /* ใช้ตัวแปรควบคุม */
+            }
+            
+            .content.close {
+                margin-left: 230px;
+            }
+            
+            .toggle-btn {
+                left: 15px;
+                top: 15px;
+            }
+            
+            header {
+                padding: 25px;
+                margin: 0 0 25px 0;
+                border-radius: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8rem; /* ลดขนาดหัวข้อสำหรับมือถือ */
+                line-height: 1.3;
+            }
+            
+            header p {
+                font-size: 1rem;
+            }
+            
+            .card {
+                padding: 25px;
+                margin-bottom: 25px;
+                border-radius: 10px;
+            }
+            
+            .card h2 {
+                font-size: 1.4rem;
+                margin-bottom: 20px;
+            }
+            
+            /* ปรับปรุงการแสดงผลแบบ flex บนมือถือ */
+            .info-box, .service-item {
+                min-width: 100% !important;
+                margin-bottom: 20px;
+                
+            }
+            
+            /* ปรับปรุงการแสดงผล grid บนมือถือ */
+            .portfolio-grid {
+                grid-template-columns: 1fr !important;
+                gap: 20px;
+            }
+            
+            .portfolio-item {
+                height: 150px;
+            }
+            
+            /* ปรับปรุงฟอร์มบนมือถือ */
+            .form-group {
+                margin-bottom: 20px;
+            }
+            
+            input, textarea {
+                padding: 14px;
+            }
+            
+            button.btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            /* ปรับปรุงการจัดวาง contact section */
+            #contact > div {
                 flex-direction: column;
             }
             
-            .sidebar {
-                width: 100%;
-                height: auto;
+            #contact > div > div {
+                min-width: 100% !important;
             }
             
-            .vegetable-grid {
-                grid-template-columns: 1fr;
+            /* ปรับปรุง footer */
+            footer {
+                padding: 25px 15px;
+                margin-top: 25px;
             }
-        }
-    </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-<body>
-    <div class="container">
-        <!-- เมนูด้านซ้าย -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h2>หมวดหมู่ผัก</h2>
-                <button class="close-btn" onclick="closeSidebar()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <ul class="categories">
-                <li class="category-item" onclick="showCategory('leafy')">
-                    <i class="fas fa-leaf"></i> ผักใบเขียว
-                </li>
-                <li class="category-item" onclick="showCategory('fruit')">
-                    <i class="fas fa-apple-alt"></i> ผักผล
-                </li>
-                <li class="category-item" onclick="showCategory('root')">
-                    <i class="fas fa-carrot"></i> ผักหัว
-                </li>
-                <li class="category-item" onclick="showCategory('herb')">
-                    <i class="fas fa-seedling"></i> สมุนไพร
-                </li>
-                <li class="category-item" onclick="showCategory('organic')">
-                    <i class="fas fa-leaf"></i> ผักออร์แกนิก
-                </li>
-            </ul>
-        </div>
-        
-        <!-- เนื้อหาหลัก -->
-        <div class="content">
-            <div class="logo">
-                <h1>ผักสดใหม่</h1>
-                <p>แหล่งข้อมูลเกี่ยวกับผักนานาชนิด</p>
-            </div>
             
-            <div class="vegetable-grid">
-                <div class="vegetable-card">
-                    <div class="card-img">
-                        <i class="fas fa-leaf"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3>ผักคะน้า</h3>
-                        <p>ผักใบเขียวมากคุณประโยชน์ อุดมด้วยวิตามินและแร่ธาตุ</p>
-                    </div>
-                </div>
-                
-                <div class="vegetable-card">
-                    <div class="card-img">
-                        <i class="fas fa-carrot"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3>แครอท</h3>
-                        <p>ผักหัวสีส้ม อุดมด้วยเบต้าแคโรทีนที่ดีต่อสายตา</p>
-                    </div>
-                </div>
-                
-                <div class="vegetable-card">
-                    <div class="card-img">
-                        <i class="fas fa-pepper-hot"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3>พริกหวาน</h3>
-                        <p>ผักผลหลากสี รสชาติกรอบอร่อย ใช้ประกอบอาหารได้หลายเมนู</p>
-                    </div>
-                </div>
-                
-                <div class="vegetable-card">
-                    <div class="card-img">
-                        <i class="fas fa-seedling"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3>โหระพา</h3>
-                        <p>สมุนไพรกลิ่นหอม ใช้เป็นส่วนประกอบในอาหารอิตาเลียนและไทย</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function showCategory(category) {
-            alert('คุณเลือกหมวดหมู่: ' + category);
-            // ในเว็บจริงควรแสดงเนื้อหาตามหมวดหมู่ที่เลือก
-        }
-        
-        function closeSidebar() {
-            document.querySelector('.sidebar').style.transform = 'translateX(-100%)';
-            // ในเว็บจริงอาจต้องเพิ่มปุ่มเพื่อเปิดเมนูคืน
-        }
-    </script>
-</body>
-  </html>
+            /* เพิ่มระยะห่างให้กับส่วนต่างๆ */
+            .article {
